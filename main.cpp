@@ -1,21 +1,41 @@
 #include <iostream>
 #include <windows.h>
 #include <stdio.h>
+#include <fstream>
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    printf("Received %d arguments\n", argc);
-    char *path = argv[1];
-    printf("Received path: %s\n", path);
-    int result = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE);
-    if (result)
+    string path;
+    if (argc == 2)
     {
-        printf("Wallpaper set\n");
+        cout << "Received " << argc << " arguments" << endl;
+        path = argv[1];
     }
     else
     {
-        printf("Wallpaper not set\n");
+        cout << "No path argument found." << endl;
+        cout << "Loading config file" << endl;
+        ifstream ConfigFile("config");
+        if (!ConfigFile)
+        {
+            cerr << "ERROR: Expected a file named \"config\" in this directory." << endl;
+            return -1;
+        }
+        string line;
+        getline(ConfigFile, path);
+    }
+    cout << "Received path: " << path << endl;
+    char *cpath = path.data();
+    int result = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, cpath, SPIF_UPDATEINIFILE);
+
+    if (result)
+    {
+        cout << "Wallpaper set" << endl;
+    }
+    else
+    {
+        cout << "Wallpaper not set" << endl;
     }
 }
